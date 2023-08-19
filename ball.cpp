@@ -5,7 +5,6 @@
 #include "ball.hpp"
 #include "constants.hpp"
 #include <cstdlib>
-#include <iostream>
 
 sf::CircleShape Ball::getShape() const {
     return m_shape;
@@ -15,7 +14,7 @@ sf::Vector2f Ball::getPosition() const {
     return m_position;
 }
 
-void Ball::setPosition() {
+void Ball::updatePosition() {
     m_shape.setPosition(m_position - sf::Vector2f(m_halfSize, m_halfSize));
 }
 
@@ -23,7 +22,7 @@ void Ball::reset() {
     m_position = sf::Vector2f(
             static_cast<float>(WINDOW_WIDTH) / 2,
             static_cast<float>(WINDOW_HEIGHT) / 2);
-    setPosition();
+    updatePosition();
 
     // Generate random direction
     // TODO understand how C++ handles RNG
@@ -33,8 +32,7 @@ void Ball::reset() {
 }
 
 void Ball::update() {
-    m_position.x += m_velocity.x;
-    m_position.y += m_velocity.y;
+    m_position += m_velocity;
 }
 
 void Ball::solveCollisions(const sf::Vector2f& overlap) {
@@ -66,13 +64,15 @@ void Ball::solveCollisions(const sf::Vector2f& overlap) {
     }
 
     // New position
-    setPosition();
+    updatePosition();
 }
 
 sf::Vector2f Ball::checkCollisionAABB(const Paddle& paddle) const {
     sf::Vector2f paddlePosition{paddle.getPosition()};
     sf::Vector2f paddleHalfSize{paddle.getHalfSize()};
-    sf::Vector2f delta{abs(paddlePosition.x - m_position.x), abs(paddlePosition.y - m_position.y)};
+    sf::Vector2f delta = paddlePosition - m_position;
+    delta.x = abs(delta.x);
+    delta.y = abs(delta.y);
     float overlapX = paddleHalfSize.x + m_halfSize - delta.x;
     float overlapY = paddleHalfSize.y + m_halfSize - delta.y;
     return sf::Vector2f{overlapX, overlapY};

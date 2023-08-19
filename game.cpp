@@ -5,7 +5,6 @@
 #include "game.hpp"
 #include "constants.hpp"
 #include "ball.hpp"
-#include <iostream>
 #include <string>
 
 void Game::setup() {
@@ -144,6 +143,7 @@ void Game::run() {
                     m_gameState = GameState::PAUSE;
                 }
 
+                // Check if
                 if (m_scoreLeft == 5) {
                     m_outcomeState = OutcomeState::WIN;
                     m_gameState = GameState::END;

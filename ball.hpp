@@ -21,7 +21,7 @@ public:
     };
     sf::CircleShape getShape() const;
     sf::Vector2f getPosition() const;
-    void setPosition();
+    void updatePosition();
     void reset();
     void update();
     void solveCollisions(const sf::Vector2f& overlap);
