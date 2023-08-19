@@ -10,16 +10,13 @@
 #include <SFML/Graphics.hpp>
 
 class Ball {
-    sf::CircleShape m_shape{};
-    float m_size{};
-    float m_halfSize{};
+    float m_size{BALL_SIZE};
+    float m_halfSize{m_size / 2.0f};
+    sf::CircleShape m_shape{m_size};
     sf::Vector2f m_position{};
     sf::Vector2f m_velocity{};
 public:
     Ball() {
-        m_size = BALL_SIZE;
-        m_halfSize = m_size / 2.0f;
-        m_shape = sf::CircleShape(m_size);
         reset();
     };
     sf::CircleShape getShape() const;

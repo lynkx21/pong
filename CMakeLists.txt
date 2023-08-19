@@ -6,10 +6,7 @@ find_package(SFML COMPONENTS graphics window REQUIRED)
 
 add_executable(pong main.cpp
         game.cpp
-        game.hpp
         ball.cpp
-        ball.hpp
-        constants.hpp
         paddle.cpp
-        paddle.hpp)
+        constants.cpp)
 target_link_libraries(pong sfml-graphics sfml-window)
