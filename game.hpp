@@ -32,14 +32,17 @@ class Game {
     OutcomeState m_outcomeState{OutcomeState::GAME_ON};
     int m_scoreLeft{};
     int m_scoreRight{};
-    sf::Text m_textLeft;
-    sf::Text m_textRight;
-    sf::Vector2f m_inputDirection{};
+    sf::Text m_textLeft{Game::m_font};
+    sf::Text m_textRight{Game::m_font};
+
 public:
     void setup();
     void reset();
-    void readInput(const sf::Event& event);
+    void processInput();
+    void readInputPressed(const sf::Event::KeyPressed* keyPressed);
+    void readInputReleased(const sf::Event::KeyReleased* keyReleased);
     void run();
+    void update();
     void render();
     void drawScore(const int& score, sf::Text& text, float xPos);
     sf::Text drawText(const std::string& s);

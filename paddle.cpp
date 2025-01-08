@@ -14,7 +14,7 @@ sf::Vector2f Paddle::getPosition() const {
     return m_position;
 }
 
-void Paddle::setPosition() {
+void Paddle::updatePosition() {
     m_shape.setPosition(m_position - m_halfSize);
 }
 
@@ -32,16 +32,52 @@ void Paddle::reset() {
                 WINDOW_WIDTH * (1 - PADDLE_DISTANCE) - m_halfSize.x,
                 WINDOW_HEIGHT / 2.0f);
     }
-    setPosition();
+    updatePosition();
 }
 
-void Paddle::update(const sf::Vector2f& inputDirection, const sf::Vector2f& ballPosition) {
+
+void Paddle::handleInputPressed(const sf::Event::KeyPressed* keyPressed) {
+    m_inputDirection.y = 0.0f;
+
+    if (m_control == PaddleControl::CPU) {
+        return;
+    }
+
+    sf::Keyboard::Scan paddle_up = m_side == PaddleSide::LEFT ? sf::Keyboard::Scancode::W : sf::Keyboard::Scancode::Up;
+    sf::Keyboard::Scan paddle_down = m_side == PaddleSide::LEFT ? sf::Keyboard::Scancode::S : sf::Keyboard::Scancode::Down;
+
+    // const auto* keyPressed{event->getIf<sf::Event::KeyPressed>()};
+    // const auto* keyReleased{event->getIf<sf::Event::KeyReleased>()};
+    if (keyPressed->scancode == paddle_up) {
+        m_inputDirection.y = -1.0f;
+    }
+    if (keyPressed->scancode == paddle_down) {
+        m_inputDirection.y = 1.0f;
+    }
+}
+
+void Paddle::handleInputReleased(const sf::Event::KeyReleased* keyReleased) {
+    m_inputDirection.y = 0.0f;
+
+    if (m_control == PaddleControl::CPU) {
+        return;
+    }
+
+    sf::Keyboard::Scan paddle_up = m_side == PaddleSide::LEFT ? sf::Keyboard::Scancode::W : sf::Keyboard::Scancode::Up;
+    sf::Keyboard::Scan paddle_down = m_side == PaddleSide::LEFT ? sf::Keyboard::Scancode::S : sf::Keyboard::Scancode::Down;
+
+    if (keyReleased->scancode == paddle_up || keyReleased->scancode == paddle_down) {
+        m_inputDirection.y = 0.0f;
+    }
+}
+
+
+void Paddle::update(const sf::Vector2f& ballPosition) {
     float new_pos_y{m_position.y};
     if (m_control == PaddleControl::USER) {
-        if (inputDirection.y != 0) {
-            new_pos_y += m_velocity.y * inputDirection.y;
-        }
+            new_pos_y += m_velocity.y * m_inputDirection.y;
     } else {
+        // CPU
         if (ballPosition.y < m_position.y) {
             new_pos_y -= m_velocity.y;
         } else if (ballPosition.y > m_position.y) {
@@ -57,5 +93,5 @@ void Paddle::update(const sf::Vector2f& inputDirection, const sf::Vector2f& ball
     }
 
     m_position.y = new_pos_y;
-    setPosition();
+    updatePosition();
 }

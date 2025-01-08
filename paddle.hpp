@@ -26,6 +26,7 @@ class Paddle {
     PaddleControl m_control{};
     sf::Vector2f m_position{};
     sf::Vector2f m_velocity{0.0f, PADDLE_VELOCITY};
+    sf::Vector2f m_inputDirection{};
 public:
     Paddle(PaddleSide side, PaddleControl control) {
         m_side = side;
@@ -34,10 +35,12 @@ public:
     }
     sf::RectangleShape getShape() const;
     sf::Vector2f getPosition() const;
-    void setPosition();
+    void updatePosition();
     sf::Vector2f getHalfSize() const;
     void reset();
-    void update(const sf::Vector2f& inputDirection, const sf::Vector2f& ballPosition);
+    void update(const sf::Vector2f& ballPosition);
+    void handleInputPressed(const sf::Event::KeyPressed* keyPressed);
+    void handleInputReleased(const sf::Event::KeyReleased* keyReleased);
 };
 
 
