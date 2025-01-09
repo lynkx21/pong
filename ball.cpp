@@ -5,6 +5,16 @@
 #include "ball.hpp"
 #include "constants.hpp"
 #include <cstdlib>
+#include <math.h>
+
+sf::Vector2f getVelocity(float xDir, float yDir) {
+    float angleModifier = std::acosf(std::fabs(xDir)) + M_PI / 4 / (M_PI / 2);
+    return sf::Vector2f{BALL_VELOCITY * (1 + std::fabs(angleModifier - 0.5f)) * xDir, BALL_VELOCITY * (1 + std::fabs(angleModifier - 0.5f)) * yDir};
+}
+
+float getPositionRelativeToPaddle(float yBallPosition, float yPaddlePosition, float yPaddleHalfSize) {
+    return (yBallPosition - (yPaddlePosition - yPaddleHalfSize)) / (2.0f * yPaddleHalfSize);
+}
 
 sf::CircleShape Ball::getShape() const {
     return m_shape;
@@ -26,16 +36,18 @@ void Ball::reset() {
 
     // Generate random direction
     // TODO understand how C++ handles RNG
-    float xDir = 2.0f * static_cast<float>(std::rand() % 2) - 1.0f;
-    float yDir = 2.0f * static_cast<float>(std::rand() % 2) - 1.0f;
-    m_velocity = sf::Vector2f(BALL_VELOCITY * xDir, BALL_VELOCITY * yDir);
+    float xDir = static_cast<float>(std::rand() / RAND_MAX) - 0.5f;
+    float yDir = static_cast<float>(std::rand() / RAND_MAX) - 0.5f;
+    sf::Vector2f vel{xDir, yDir};
+    vel = vel.normalized();
+    m_velocity = getVelocity(vel.x, vel.y);
 }
 
 void Ball::update() {
     m_position += m_velocity;
 }
 
-void Ball::solveCollisions(const sf::Vector2f& overlap) {
+void Ball::solveCollisions(const sf::Vector2f& overlap, const float angleModifier) {
     // Vertical collision
     if (m_position.y - m_halfSize < 0) {
         // Position the ball by the quantity of overlap over the top boundary
@@ -54,12 +66,15 @@ void Ball::solveCollisions(const sf::Vector2f& overlap) {
         // Left collision
         float paddleEdge = m_position.x - m_halfSize - overlap.x;
         m_position.x = paddleEdge + m_halfSize - overlap.x;
-        m_velocity.x *= -1;
+        float angle = -M_PI / 4 + M_PI / 2 * angleModifier;
+        m_velocity = getVelocity(cos(angle), sin(angle));
     } else if (overlap.x > 0) {
         // Right collision
         // FIXME
         float paddleEdge = m_position.x;
         m_position.x = m_position.x - 2.0f * overlap.x;
+        float angle = -M_PI / 4 + M_PI / 2 * angleModifier;
+        m_velocity = getVelocity(cos(angle), sin(angle));
         m_velocity.x *= -1;
     }
 
@@ -67,7 +82,7 @@ void Ball::solveCollisions(const sf::Vector2f& overlap) {
     updatePosition();
 }
 
-sf::Vector2f Ball::checkCollisionAABB(const Paddle& paddle) const {
+sf::Vector3f Ball::checkCollisionAABB(const Paddle& paddle) const {
     sf::Vector2f paddlePosition{paddle.getPosition()};
     sf::Vector2f paddleHalfSize{paddle.getHalfSize()};
     sf::Vector2f delta = paddlePosition - m_position;
@@ -75,5 +90,6 @@ sf::Vector2f Ball::checkCollisionAABB(const Paddle& paddle) const {
     delta.y = abs(delta.y);
     float overlapX = paddleHalfSize.x + m_halfSize - delta.x;
     float overlapY = paddleHalfSize.y + m_halfSize - delta.y;
-    return sf::Vector2f{overlapX, overlapY};
+    float yPositionToPaddle = getPositionRelativeToPaddle(m_position.y, paddlePosition.y, paddleHalfSize.y);
+    return sf::Vector3f{overlapX, overlapY, yPositionToPaddle};
 }

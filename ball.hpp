@@ -17,6 +17,7 @@ class Ball {
     sf::Vector2f m_velocity{};
 public:
     Ball() {
+        // std::srand(NULL);
         reset();
     };
     sf::CircleShape getShape() const;
@@ -24,8 +25,8 @@ public:
     void updatePosition();
     void reset();
     void update();
-    void solveCollisions(const sf::Vector2f& overlap);
-    sf::Vector2f checkCollisionAABB(const Paddle& paddle) const;
+    void solveCollisions(const sf::Vector2f& overlap, const float angleModifier);
+    sf::Vector3f checkCollisionAABB(const Paddle& paddle) const;
 };
 
 

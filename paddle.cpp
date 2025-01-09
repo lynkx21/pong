@@ -46,8 +46,6 @@ void Paddle::handleInputPressed(const sf::Event::KeyPressed* keyPressed) {
     sf::Keyboard::Scan paddle_up = m_side == PaddleSide::LEFT ? sf::Keyboard::Scancode::W : sf::Keyboard::Scancode::Up;
     sf::Keyboard::Scan paddle_down = m_side == PaddleSide::LEFT ? sf::Keyboard::Scancode::S : sf::Keyboard::Scancode::Down;
 
-    // const auto* keyPressed{event->getIf<sf::Event::KeyPressed>()};
-    // const auto* keyReleased{event->getIf<sf::Event::KeyReleased>()};
     if (keyPressed->scancode == paddle_up) {
         m_inputDirection.y = -1.0f;
     }

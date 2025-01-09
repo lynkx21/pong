@@ -99,14 +99,16 @@ void Game::update() {
     m_paddleRight.update(m_ball.getPosition());
     m_ball.update();
 
-    sf::Vector2 overlapLeft{m_ball.checkCollisionAABB(m_paddleLeft)};
-    sf::Vector2 overlapRight{m_ball.checkCollisionAABB(m_paddleRight)};
+    sf::Vector3f collisionOutcomeLeft{m_ball.checkCollisionAABB(m_paddleLeft)};
+    sf::Vector3f collisionOutcomeRight{m_ball.checkCollisionAABB(m_paddleRight)};
+    sf::Vector2f overlapLeft{collisionOutcomeLeft.x, collisionOutcomeLeft.y};
+    sf::Vector2f overlapRight{collisionOutcomeRight.x, collisionOutcomeRight.y};
     if (overlapLeft.x > 0 && overlapLeft.y > 0) {
-        m_ball.solveCollisions(-overlapLeft);
+        m_ball.solveCollisions(-overlapLeft, collisionOutcomeLeft.z);
     } else if (overlapRight.x > 0 && overlapRight.y > 0) {
-        m_ball.solveCollisions(overlapRight);
+        m_ball.solveCollisions(overlapRight, collisionOutcomeRight.z);
     } else {
-        m_ball.solveCollisions(sf::Vector2{0.0f, 0.0f});
+        m_ball.solveCollisions(sf::Vector2{0.0f, 0.0f}, 0.0f);
     }
 
     // Check for scores
